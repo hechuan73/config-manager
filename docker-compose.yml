@@ -3,7 +3,7 @@ services:
 
   api-server:
       build: .
-      image: fault_localization/com.fdse.config_manager
+      image: hechuan73/config_manager
       restart: always
       ports:
         - 18898:18898
