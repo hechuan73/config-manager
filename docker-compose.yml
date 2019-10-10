@@ -1,0 +1,17 @@
+version: '3'
+services:
+
+  api-server:
+      build: .
+      image: fault_localization/com.fdse.config_manager
+      restart: always
+      ports:
+        - 18898:18898
+      networks:
+        - my-network
+
+networks:
+    my-network:
+      # driver: overlay
+      driver: bridge
+
