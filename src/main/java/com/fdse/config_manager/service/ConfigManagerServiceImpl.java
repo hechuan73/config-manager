@@ -1576,13 +1576,29 @@ public class ConfigManagerServiceImpl implements ConfigManagerService {
         if (null == serviceMetricsConfig) {
             return null;
         }
+
+        String cpu = serviceMetricsConfig.get("cpu");
+        if (null == cpu) { cpu = ""; }
         else {
-            serviceMetricsConfigWithoutUnit.put("memory", null == serviceMetricsConfig.get("memory") ?
-                    "" : serviceMetricsConfig.get("memory").split("Mi")[0]);
-            serviceMetricsConfigWithoutUnit.put("cpu", null == serviceMetricsConfig.get("cpu") ?
-                    "" : new BigDecimal(serviceMetricsConfig.get("cpu").split("m")[0])
-                        .divide(new BigDecimal(1000), 3, RoundingMode.HALF_UP).toString());
+            // the unit is nano core, 1 core = 1000m core = 10^9 n core.
+            if (cpu.contains("n")) {
+                cpu = new BigDecimal(cpu.split("n")[0])
+                        .divide(new BigDecimal(1000000000), 3, RoundingMode.HALF_UP).toString();
+            }
+            // the unit is milli core, 200m core = 0.2 core
+            else if (cpu.contains("m")) {
+                cpu = new BigDecimal(cpu.split("m")[0])
+                        .divide(new BigDecimal(1000), 3, RoundingMode.HALF_UP).toString();
+            }
+            // if cpu do not contain unit, just keep it.
         }
+
+
+        String memory = null == serviceMetricsConfig.get("memory") ?
+                "" : serviceMetricsConfig.get("memory").split("Mi")[0];
+
+        serviceMetricsConfigWithoutUnit.put("memory", memory);
+        serviceMetricsConfigWithoutUnit.put("cpu", cpu);
 
         return serviceMetricsConfigWithoutUnit;
     }
